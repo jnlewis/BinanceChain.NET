@@ -6,6 +6,7 @@
 * Complete HTTP API and Web Socket coverage
 * Strongly typed bindings on all API and Web Socket entities.
 * Build-in transaction signing for broadcast.
+* Node RPC support (coming soon)
 
 ## Compatability
 The library is built on .NET Standard 2.0 and is compatable with .NET Framework (Windows) and .NET Core (Windows, Mac, and Linux).
