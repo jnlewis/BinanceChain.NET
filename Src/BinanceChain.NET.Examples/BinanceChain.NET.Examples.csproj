@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>BinanceChain.NET.Examples</AssemblyName>
+    <RootNamespace>BinanceChain.NET.Examples</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BinanceChain.NET\BinanceChain.NET.csproj" />
+  </ItemGroup>
+
+</Project>
