@@ -1,4 +1,4 @@
-# Binance Chain SDK for the .NET platform.
+# Binance Chain SDK for the .NET Platform.
 **BinanceChainNET is a complete library for interacting with the Binance Chain (DEX) on the .NET platform.**
 
 ## Features
