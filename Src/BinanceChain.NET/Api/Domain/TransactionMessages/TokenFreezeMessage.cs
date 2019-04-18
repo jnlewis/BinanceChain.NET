@@ -8,26 +8,29 @@ namespace BinanceChain.NET.Api.Domain.TransactionMessages
     {
         private readonly Wallet wallet;
         private readonly TransactionOption options;
-        private readonly TokenFreezeProto proto;
+        private readonly TokenFreezeProto message;
 
         public TokenFreezeMessage(TokenFreeze tokenFreeze, Wallet wallet, TransactionOption options)
         {
             this.wallet = wallet;
             this.options = options;
 
-            this.proto = new TokenFreezeProto();
-            this.proto.From = wallet.Address;
-            this.proto.Symbol = tokenFreeze.Symbol;
-            this.proto.Amount = StringDecimalToLong(tokenFreeze.Amount);
+            this.message = new TokenFreezeProto();
+            this.message.From = wallet.Address;
+            this.message.Symbol = tokenFreeze.Symbol;
+            this.message.Amount = StringDecimalToLong(tokenFreeze.Amount);
         }
-        
-        public override RequestBody ToRequest()
-        {
-            byte[] message = base.Encode<TokenFreezeProto>(proto);
-            byte[] signature = base.GetSignatureBytes(proto, wallet, options);
-            byte[] stdTx = base.GetStandardTxBytes(message, signature, options);
 
-            return new RequestBody() { Data = stdTx };
+        public override string BuildMessageBody()
+        {
+            this.wallet.EnsureWalletIsReady();
+
+            byte[] encodedMessage = base.EncodeMessage<TokenFreezeProto>(message, MessagePrefixes.Vote);
+            byte[] signedBytes = base.Sign(message, wallet, options);
+            byte[] signature = base.EncodeSignature(signedBytes, wallet, options);
+            byte[] stdTx = base.EncodeStandardTx(encodedMessage, signature, options);
+
+            return base.BytesToHex(stdTx);
         }
     }
 }

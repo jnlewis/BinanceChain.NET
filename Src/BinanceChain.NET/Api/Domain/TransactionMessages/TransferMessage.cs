@@ -8,7 +8,7 @@ namespace BinanceChain.NET.Api.Domain.TransactionMessages
     {
         private readonly Wallet wallet;
         private readonly TransactionOption options;
-        private readonly TransferProto proto;
+        private readonly TransferProto message;
 
         public TransferMessage(Transfer transfer, Wallet wallet, TransactionOption options)
         {
@@ -27,18 +27,23 @@ namespace BinanceChain.NET.Api.Domain.TransactionMessages
             output.Address = transfer.ToAddress;
             output.Coins.Add(token);
 
-            this.proto = new TransferProto();
-            this.proto.Inputs.Add(input);
-            this.proto.Outputs.Add(output);
+            this.message = new TransferProto();
+            this.message.Inputs.Add(input);
+            this.message.Outputs.Add(output);
         }
         
-        public override RequestBody ToRequest()
+        public override string BuildMessageBody()
         {
-            byte[] message = base.Encode<TransferProto>(proto);
-            byte[] signature = base.GetSignatureBytes(proto, wallet, options);
-            byte[] stdTx = base.GetStandardTxBytes(message, signature, options);
+            this.wallet.EnsureWalletIsReady();
+            
+            byte[] encodedMessage = base.EncodeMessage<TransferProto>(message, MessagePrefixes.Transfer);
+            byte[] signedBytes = base.Sign(message, wallet, options);
+            byte[] signature = base.EncodeSignature(signedBytes, wallet, options);
+            byte[] stdTx = base.EncodeStandardTx(encodedMessage, signature, options);
 
-            return new RequestBody() { Data = stdTx };
+            this.wallet.IncrementSequence();
+
+            return base.BytesToHex(stdTx);
         }
     }
 }

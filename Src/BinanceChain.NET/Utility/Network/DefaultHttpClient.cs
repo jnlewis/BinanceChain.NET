@@ -18,11 +18,7 @@ namespace BinanceChain.NET.Utility.Network
 
         public async Task<T> GetAsync<T>(string requestUrl)
         {
-            var response = await _httpClient.GetAsync(requestUrl, HttpCompletionOption.ResponseHeadersRead);
-            response.EnsureSuccessStatusCode();
-            var data = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<T>(data);
+            return await GetAsync<T>(new Uri(requestUrl));
         }
 
         public async Task<T> GetAsync<T>(Uri requestUrl)
@@ -36,8 +32,13 @@ namespace BinanceChain.NET.Utility.Network
 
         public async Task<T> PostAsync<T>(string requestUrl, object content)
         {
-            var stringContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
+            return await PostAsync<T>(new Uri(requestUrl), content);
+        }
 
+        public async Task<T> PostAsync<T>(Uri requestUrl, object content)
+        {
+            var stringContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
+            
             var response = await _httpClient.PostAsync(requestUrl, stringContent);
             response.EnsureSuccessStatusCode();
             var data = await response.Content.ReadAsStringAsync();
@@ -45,10 +46,15 @@ namespace BinanceChain.NET.Utility.Network
             return JsonConvert.DeserializeObject<T>(data);
         }
 
-        public async Task<T> PostAsync<T>(Uri requestUrl, object content)
+        public async Task<T> PostAsync<T>(string requestUrl, object content, Encoding encoding, string mediaType)
         {
-            var stringContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
-            
+            return await PostAsync<T>(new Uri(requestUrl), content, encoding, mediaType);
+        }
+
+        public async Task<T> PostAsync<T>(Uri requestUrl, object content, Encoding encoding, string mediaType)
+        {
+            var stringContent = new StringContent(JsonConvert.SerializeObject(content), encoding, mediaType);
+
             var response = await _httpClient.PostAsync(requestUrl, stringContent);
             response.EnsureSuccessStatusCode();
             var data = await response.Content.ReadAsStringAsync();

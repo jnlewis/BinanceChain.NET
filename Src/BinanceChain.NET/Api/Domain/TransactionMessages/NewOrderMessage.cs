@@ -23,22 +23,22 @@ namespace BinanceChain.NET.Api.Domain.TransactionMessages
     {
         private readonly Wallet wallet;
         private readonly TransactionOption options;
-        private readonly NewOrderProto proto;
+        private readonly NewOrderProto message;
 
         public NewOrderMessage(NewOrder order, Wallet wallet, TransactionOption options)
         {
             this.wallet = wallet;
             this.options = options;
 
-            this.proto = new NewOrderProto();
-            this.proto.Sender = wallet.Address;
-            this.proto.Id = GenerateOrderId(wallet);
-            this.proto.Symbol = order.Symbol;
-            this.proto.OrderType = order.OrderType;
-            this.proto.Side = order.Side;
-            this.proto.Price = base.StringDecimalToLong(order.Price);
-            this.proto.Quantity = base.StringDecimalToLong(order.Quantity);
-            this.proto.TimeInForce = order.TimeInForce;
+            this.message = new NewOrderProto();
+            this.message.Sender = wallet.Address;
+            this.message.Id = GenerateOrderId(wallet);
+            this.message.Symbol = order.Symbol;
+            this.message.OrderType = order.OrderType;
+            this.message.Side = order.Side;
+            this.message.Price = base.StringDecimalToLong(order.Price);
+            this.message.Quantity = base.StringDecimalToLong(order.Quantity);
+            this.message.TimeInForce = order.TimeInForce;
         }
 
         /// <summary>
@@ -55,13 +55,16 @@ namespace BinanceChain.NET.Api.Domain.TransactionMessages
             return $"{wallet.Address.ToUpper()}-{(wallet.Sequence + 1)}";
         }
 
-        public override RequestBody ToRequest()
+        public override string BuildMessageBody()
         {
-            byte[] message = base.Encode<NewOrderProto>(proto);
-            byte[] signature = base.GetSignatureBytes(proto, wallet, options);
-            byte[] stdTx = base.GetStandardTxBytes(message, signature, options);
+            this.wallet.EnsureWalletIsReady();
 
-            return new RequestBody() { Data = stdTx };
+            byte[] encodedMessage = base.EncodeMessage<NewOrderProto>(message, MessagePrefixes.Vote);
+            byte[] signedBytes = base.Sign(message, wallet, options);
+            byte[] signature = base.EncodeSignature(signedBytes, wallet, options);
+            byte[] stdTx = base.EncodeStandardTx(encodedMessage, signature, options);
+
+            return base.BytesToHex(stdTx);
         }
     }
 }

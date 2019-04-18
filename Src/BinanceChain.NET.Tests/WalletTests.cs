@@ -6,10 +6,10 @@ namespace BinanceChain.NET.Tests
     public class WalletTests
     {
         [TestMethod]
-        public void CreateTest()
+        public void NewWallet_Test()
         {
-            Wallet wallet = Wallet.Create("testpassword", EnvironmentInfo.FAKE);
-
+            Wallet wallet = Wallet.NewWallet("testpassword", EnvironmentInfo.TESTNET);
+            
             Assert.IsTrue(wallet != null);
         }
     }

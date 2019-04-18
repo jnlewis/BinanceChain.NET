@@ -11,58 +11,74 @@ namespace BinanceChain.NET.Api.Domain
 {
     internal abstract class TransactionMessage
     {
-        public abstract RequestBody ToRequest();
+        public abstract string BuildMessageBody();
 
         public long StringDecimalToLong(string value)
         {
-            return Convert.ToInt64(value);  //TODO: format decimals
+            decimal MULTIPLY_FACTOR = 1e8M;
+            decimal encodeValue = decimal.Multiply(Convert.ToDecimal(value), MULTIPLY_FACTOR);
+            if (encodeValue.CompareTo(decimal.Zero) <= 0)
+            {
+                throw new ArgumentException(value + " is less or equal to zero.");
+            }
+            if (encodeValue.CompareTo(long.MaxValue) > 0)
+            {
+                throw new ArgumentException(value + " is too large.");
+            }
+            return decimal.ToInt64(encodeValue);
         }
-
-        public byte[] Encode<T>(T message) where T : class
+        
+        public string BytesToHex(byte[] bytes)
         {
-            return this.ProtoSerialize<T>(message);
-        }
-
-        public byte[] GetSignatureBytes(ProtoMessage message, Wallet wallet, TransactionOption options)
-        {
-            return Encode<byte[]>(Sign(message, wallet, options));
+            return EncodeUtils.BytesToHex(bytes);
         }
 
         public byte[] Sign(ProtoMessage message, Wallet wallet, TransactionOption options)
         {
-            SignData sd = new SignData();
-            //sd.ChainId = wallet.ChainId;    //TODO:
-            //sd.AccountNumber = wallet.AccountNumber;    //TODO:
-            sd.Sequence = wallet.Sequence.ToString();
-            sd.Msgs = new List<ProtoMessage>() { message };
-            sd.Memo = options.Memo;
-            sd.Source = options.Source;
-            sd.Data = options.Data;
+            SignData signData = new SignData();
+            signData.ChainId = wallet.ChainId;
+            signData.AccountNumber = wallet.AccountNumber.ToString();
+            signData.Sequence = wallet.Sequence.ToString();
+            signData.Msgs = new List<ProtoMessage>() { message };
+            signData.Memo = options.Memo;
+            signData.Source = options.Source;
+            signData.Data = options.Data;
 
-            //byte[] sdBytes = JsonConvert.SerializeObject(sd).ToByteArray(); //TODO:
-            byte[] sdBytes = null;
-
-            CryptoUtility util = new CryptoUtility();
-            return util.Sign(sdBytes, wallet.PrivateKey);
+            return CryptoUtility.Sign(signData, wallet.EcKey);
         }
 
-        public byte[] GetStandardTxBytes(byte[] message, byte[] signature, TransactionOption options)
+        public byte[] EncodeSignature(byte[] signature, Wallet wallet, TransactionOption options)
         {
-            return Encode<StdTxProto>(BuildStandardTx(message, signature, options));
+            StdSignatureProto stdSignature = new StdSignatureProto
+            {
+                PubKey = wallet.PubKeyForSign,
+                Signature = signature,
+                AccountNumber = wallet.AccountNumber.Value,
+                Sequence = wallet.Sequence.Value
+            };
+            
+            return EncodeMessage<StdSignatureProto>(stdSignature, MessagePrefixes.StdSignature);
         }
 
-        public StdTxProto BuildStandardTx(byte[] message, byte[] signature, TransactionOption options)
+        public byte[] EncodeStandardTx(byte[] message, byte[] signature, TransactionOption options)
         {
-            StdTxProto stdTx = new StdTxProto();
-            stdTx.Msgs = message;
-            stdTx.Signatures = signature;
-            stdTx.Memo = options.Memo;
-            stdTx.Source = options.Source;
-            stdTx.Data = options.Data != null ? options.Data : null;
-
-            return stdTx;
+            StdTxProto stdTx = new StdTxProto()
+            {
+                Msgs = message,
+                Signatures = signature,
+                Memo = options.Memo,
+                Source = options.Source,
+                Data = options.Data != null ? options.Data : null
+            };
+            
+            return EncodeMessage<StdTxProto>(stdTx, MessagePrefixes.StdTx);
         }
 
+        public byte[] EncodeMessage<T>(T message, byte[] prefix) where T : class
+        {
+            return EncodeUtils.AminoWrap(this.ProtoSerialize<T>(message), prefix, false);
+        }
+        
         private byte[] ProtoSerialize<T>(T record) where T : class
         {
             if (record == null)
@@ -85,6 +101,7 @@ namespace BinanceChain.NET.Api.Domain
                 return Serializer.Deserialize<T>(stream);
             }
         }
+        
         
     }
 }

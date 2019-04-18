@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BinanceChain.NET.Api
 {
-    public interface BinanceChainApi
+    public interface IBinanceChainApiClient
     {
 
         #region Requests (Async)
@@ -38,7 +38,7 @@ namespace BinanceChain.NET.Api
 
         #region Broadcast (Async)
 
-        Task<List<TransactionMetadata>> BroadcastAsync(bool sync, RequestBody transaction);
+        Task<List<TransactionMetadata>> BroadcastAsync(string transaction, bool sync);
         Task<List<TransactionMetadata>> NewOrderAsync(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync);
         Task<List<TransactionMetadata>> VoteAsync(Vote vote, Wallet wallet, TransactionOption options, bool sync);
         Task<List<TransactionMetadata>> CancelOrderAsync(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync);
@@ -77,7 +77,7 @@ namespace BinanceChain.NET.Api
 
         #region Broadcasts
 
-        List<TransactionMetadata> Broadcast(bool sync, RequestBody transaction);
+        List<TransactionMetadata> Broadcast(string transaction, bool sync);
         List<TransactionMetadata> NewOrder(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync);
         List<TransactionMetadata> Vote(Vote vote, Wallet wallet, TransactionOption options, bool sync);
         List<TransactionMetadata> CancelOrder(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync);

@@ -8,25 +8,30 @@ namespace BinanceChain.NET.Api.Domain.TransactionMessages
     {
         private readonly Wallet wallet;
         private readonly TransactionOption options;
-        private readonly VoteProto proto;
+        private readonly VoteProto message;
 
         public VoteMessage(Vote vote, Wallet wallet, TransactionOption options)
         {
             this.wallet = wallet;
             this.options = options;
 
-            this.proto = new VoteProto();
-            this.proto.ProposalId = vote.ProposalId;
-            this.proto.Option = vote.Option;
+            this.message = new VoteProto();
+            this.message.ProposalId = vote.ProposalId;
+            this.message.Option = vote.Option;
         }
         
-        public override RequestBody ToRequest()
+        public override string BuildMessageBody()
         {
-            byte[] message = base.Encode<VoteProto>(proto);
-            byte[] signature = base.GetSignatureBytes(proto, wallet, options);
-            byte[] stdTx = base.GetStandardTxBytes(message, signature, options);
+            this.wallet.EnsureWalletIsReady();
+            
+            byte[] encodedMessage = base.EncodeMessage<VoteProto>(message, MessagePrefixes.Vote);
+            byte[] signedBytes = base.Sign(message, wallet, options);
+            byte[] signature = base.EncodeSignature(signedBytes, wallet, options);
+            byte[] stdTx = base.EncodeStandardTx(encodedMessage, signature, options);
 
-            return new RequestBody() { Data = stdTx };
+            this.wallet.IncrementSequence();
+
+            return base.BytesToHex(stdTx);
         }
     }
 }

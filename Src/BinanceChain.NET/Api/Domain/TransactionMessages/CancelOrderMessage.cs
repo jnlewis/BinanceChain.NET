@@ -8,25 +8,28 @@ namespace BinanceChain.NET.Api.Domain.TransactionMessages
     {
         private readonly Wallet wallet;
         private readonly TransactionOption options;
-        private readonly CancelOrderProto proto;
+        private readonly CancelOrderProto message;
 
         public CancelOrderMessage(CancelOrder cancelOrder, Wallet wallet, TransactionOption options)
         {
             this.wallet = wallet;
             this.options = options;
             
-            this.proto = new CancelOrderProto();
-            this.proto.Symbol = cancelOrder.Symbol;
-            this.proto.RefId = cancelOrder.RefId;
+            this.message = new CancelOrderProto();
+            this.message.Symbol = cancelOrder.Symbol;
+            this.message.RefId = cancelOrder.RefId;
         }
-        
-        public override RequestBody ToRequest()
-        {
-            byte[] message = base.Encode<CancelOrderProto>(proto);
-            byte[] signature = base.GetSignatureBytes(proto, wallet, options);
-            byte[] stdTx = base.GetStandardTxBytes(message, signature, options);
 
-            return new RequestBody() { Data = stdTx };
+        public override string BuildMessageBody()
+        {
+            this.wallet.EnsureWalletIsReady();
+
+            byte[] encodedMessage = base.EncodeMessage<CancelOrderProto>(message, MessagePrefixes.Vote);
+            byte[] signedBytes = base.Sign(message, wallet, options);
+            byte[] signature = base.EncodeSignature(signedBytes, wallet, options);
+            byte[] stdTx = base.EncodeStandardTx(encodedMessage, signature, options);
+
+            return base.BytesToHex(stdTx);
         }
     }
 }

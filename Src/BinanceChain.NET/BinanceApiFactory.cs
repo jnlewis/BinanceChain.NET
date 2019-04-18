@@ -6,7 +6,7 @@ namespace BinanceChain.NET
 {
     public static class BinanceApiFactory
     {
-        public static BinanceChainApi CreateApiClient(EnvironmentInfo environment)
+        public static IBinanceChainApiClient CreateApiClient(EnvironmentInfo environment)
         {
             IHttpClient httpClient = new DefaultHttpClient();
 

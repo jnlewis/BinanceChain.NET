@@ -1,27 +1,29 @@
-﻿using NBitcoin;
-using System.Text;
+﻿using BinanceChain.NET.Api.Domain.TransactionMessages;
 using BinanceChain.NET.Utility.Crypto;
+using NBitcoin;
+using System;
+using System.Globalization;
+using System.Numerics;
+using System.Text;
 
 namespace BinanceChain.NET
 {
     public class Wallet
     {
-        #region Properties
-
         public bool IsOpen { get; private set; }
         public string PrivateKey { get; private set; }
-        public string Address { get; private set; }
         public string MnemonicWords { get; private set; }
+        public string Address { get; private set; }
+        public Key EcKey { get; private set; }
+        public byte[] AddressBytes { get; private set; }
+        public byte[] PubKeyForSign { get; private set; }
+        public long? AccountNumber { get; private set; }
+        public long? Sequence { get; private set; }
         public EnvironmentInfo Environment { get; private set; }
-        public int Sequence { get; private set; }
-
-        #endregion
-
-        public Wallet()
-        {
-
-        }
+        public string ChainId { get; private set; }
         
+        public Wallet(){}
+
         public override string ToString()
         {
             return new StringBuilder()
@@ -30,53 +32,66 @@ namespace BinanceChain.NET
                 .Append($"Address:{Address};")
                 .Append($"MnemonicWords:{MnemonicWords};")
                 .Append($"Environment:{Environment};")
+                .Append($"AccountNumber:{AccountNumber};")
+                .Append($"Sequence:{Sequence};")
+                .Append($"ChainId:{ChainId};")
                 .ToString();
         }
 
-        public static Wallet Create(string password, EnvironmentInfo environment)
-        {
-            CryptoUtility cryptoUtil = new CryptoUtility();
-            var key = cryptoUtil.GenerateKey(password);
+        #region Static Methods
 
-            Wallet wallet = new Wallet()
-            {
-                IsOpen = true,
-                PrivateKey = key.PrivateKey,
-                Address = key.Address,
-                MnemonicWords = key.Mnemonic,
-                Environment = environment,
-                Sequence = 1
-            };
+        public static Wallet NewWallet(string password, EnvironmentInfo environment)
+        {
+            var key = CryptoUtility.GenerateKey(password, environment.Hrp);
+            
+            Wallet wallet = new Wallet();
+            wallet.IsOpen = true;
+            wallet.PrivateKey = key.PrivateKey;
+            wallet.Environment = environment;
+            wallet.Address = key.Address;
+            wallet.MnemonicWords = key.Mnemonic;
+            wallet.EcKey = GetECKey(wallet.PrivateKey);
+            wallet.AddressBytes = wallet.EcKey.PubKey.Hash.ToBytes();
+            wallet.PubKeyForSign = GetPubKeyForSign(wallet.EcKey.PubKey.ToBytes());
 
             return wallet;
         }
 
-        public static void Save(Wallet wallet, string file)
-        {
-            //TODO: Save wallet to file
-        }
-
-        //public static Wallet Open(string privateKey, EnvironmentInfo environment)
-        //{
-        //    return new Wallet();
-        //}
         public static Wallet Open(string mnemonicWords, string password, EnvironmentInfo environment)
         {
-            CryptoUtility cryptoUtil = new CryptoUtility();
-            var key = cryptoUtil.GetKeyFromMnemonic(mnemonicWords, password);
+            var key = CryptoUtility.GetKeyFromMnemonic(mnemonicWords, password, environment.Hrp);
 
-            Wallet wallet = new Wallet()
-            {
-                IsOpen = true,
-                PrivateKey = key.PrivateKey,
-                Address = key.Address,
-                MnemonicWords = key.Mnemonic,
-                Environment = environment,
-                Sequence = 1
-            };
+            Wallet wallet = new Wallet();
+            wallet.IsOpen = true;
+            wallet.PrivateKey = key.PrivateKey;
+            wallet.Environment = environment;
+            wallet.EcKey = GetECKey(key.PrivateKey);
+            wallet.AddressBytes = wallet.EcKey.PubKey.Hash.ToBytes();
+            wallet.Address = CryptoUtility.GetAddress(wallet.AddressBytes, environment.Hrp);
+            wallet.PubKeyForSign = GetPubKeyForSign(wallet.EcKey.PubKey.ToBytes());
+            wallet.MnemonicWords = mnemonicWords;
 
             return wallet;
         }
+
+        public static Wallet Open(string privateKey, EnvironmentInfo environment)
+        {
+            Wallet wallet = new Wallet();
+            wallet.IsOpen = true;
+            wallet.PrivateKey = privateKey;
+            wallet.Environment = environment;
+            wallet.EcKey = GetECKey(privateKey);
+            wallet.AddressBytes = wallet.EcKey.PubKey.Hash.ToBytes();
+            wallet.Address = CryptoUtility.GetAddress(wallet.AddressBytes, environment.Hrp);
+            wallet.PubKeyForSign = GetPubKeyForSign(wallet.EcKey.PubKey.ToBytes());
+            wallet.MnemonicWords = "";
+
+            return wallet;
+        }
+
+        #endregion
+
+        #region Instance Methods
 
         public void Close()
         {
@@ -92,111 +107,77 @@ namespace BinanceChain.NET
         {
             this.Sequence++;
         }
-    }
 
-    /*
-     private final static Map<BinanceDexEnvironment, String> CHAIN_IDS = new HashMap<>();
-    private String privateKey;
-    private String address;
-    private ECKey ecKey;
-    private byte[] addressBytes;
-    private byte[] pubKeyForSign;
-    private Integer accountNumber;
-    private Long sequence = null;
-    private BinanceDexEnvironment env;
+        public void EnsureWalletIsReady()
+        {
+            if (this.AccountNumber == null || this.Sequence == null)
+            {
+                InitAccount();
+            }
 
-    private String chainId;
-
-    public Wallet(String privateKey, BinanceDexEnvironment env) {
-        if (!StringUtils.isEmpty(privateKey)) {
-            this.privateKey = privateKey;
-            this.env = env;
-            this.ecKey = ECKey.fromPrivate(new BigInteger(privateKey, 16));
-            this.address = Crypto.getAddressFromECKey(this.ecKey, env.getHrp());
-            this.addressBytes = Crypto.decodeAddress(this.address);
-            byte[] pubKey = ecKey.getPubKeyPoint().getEncoded(true);
-            byte[] pubKeyPrefix = MessageType.PubKey.getTypePrefixBytes();
-            this.pubKeyForSign = new byte[pubKey.length + pubKeyPrefix.length + 1];
-            System.arraycopy(pubKeyPrefix, 0, this.pubKeyForSign, 0, pubKeyPrefix.length);
-            pubKeyForSign[pubKeyPrefix.length] = (byte) 33;
-            System.arraycopy(pubKey, 0, this.pubKeyForSign, pubKeyPrefix.length + 1, pubKey.length);
-        } else {
-            throw new IllegalArgumentException("Private key cannot be empty.");
-        }
-    }
-
-    public static Wallet createRandomWallet(BinanceDexEnvironment env) throws IOException {
-        return createWalletFromMnemonicCode(Crypto.generateMnemonicCode(), env);
-    }
-
-    public static Wallet createWalletFromMnemonicCode(List<String> words, BinanceDexEnvironment env) throws IOException {
-        String privateKey = Crypto.getPrivateKeyFromMnemonicCode(words);
-        return new Wallet(privateKey, env);
-    }
-
-    public synchronized void initAccount(BinanceDexApiRestClient client) {
-        Account account = client.getAccount(this.address);
-        if (account != null) {
-            this.accountNumber = account.getAccountNumber();
-            this.sequence = account.getSequence();
-        } else {
-            throw new IllegalStateException("Cannot get account information for address " + this.address);
-        }
-    }
-
-    public synchronized void reloadAccountSequence(BinanceDexApiRestClient client) {
-        AccountSequence accountSequence = client.getAccountSequence(this.address);
-        this.sequence = accountSequence.getSequence();
-    }
-
-    public synchronized void increaseAccountSequence() {
-        if (this.sequence != null)
-            this.sequence++;
-    }
-
-    public synchronized void decreaseAccountSequence() {
-        if (this.sequence != null)
-            this.sequence--;
-    }
-
-    public synchronized long getSequence() {
-        if (sequence == null)
-            throw new IllegalStateException("Account sequence is not initialized.");
-        return sequence;
-    }
-    
-    public synchronized void ensureWalletIsReady(BinanceDexApiRestClient client) {
-        if (accountNumber == null) {
-            initAccount(client);
-        } else if (sequence == null) {
-            reloadAccountSequence(client);
-        }
-
-        if (chainId == null) {
-            chainId = CHAIN_IDS.get(chainId);
-            if (chainId == null) {
-                initChainId(client);
+            if (this.ChainId == null)
+            {
+                InitChainId();
             }
         }
-    }
 
-    public synchronized void initChainId(BinanceDexApiRestClient client) {
-        Infos info = client.getNodeInfo();
-        chainId = info.getNodeInfo().getNetwork();
-        CHAIN_IDS.put(env, chainId);
+        private void InitAccount()
+        {
+            var api = BinanceApiFactory.CreateApiClient(this.Environment);
+
+            var account = api.GetAccount(this.Address);
+            if (account != null)
+            {
+                this.AccountNumber = account.AccountNumber;
+                this.Sequence = account.Sequence;
+            }
+            else
+            {
+                throw new NullReferenceException("Cannot get account information for address " + this.Address);
+            }
+        }
+
+        private void InitChainId()
+        {
+            var api = BinanceApiFactory.CreateApiClient(this.Environment);
+
+            var nodeInfo = api.GetNodeInfo();
+            if (nodeInfo != null)
+            {
+                this.ChainId = nodeInfo.NodeInfo.Network;
+            }
+            else
+            {
+                throw new NullReferenceException("Cannot get chain ID");
+            }
+        }
+
+        #endregion
+        
+        #region Static Private
+
+        private static Key GetECKey(string privateKey)
+        {
+            BigInteger privateKeyBigInteger = BigInteger.Parse("0" + privateKey, NumberStyles.HexNumber);
+            return new Key(privateKeyBigInteger.ToByteArray());
+        }
+        
+        private static byte[] GetPubKeyForSign(byte[] ecKeyBytes)
+        {
+            //Reference: https://github.com/binance-chain/java-sdk/blob/master/src/main/java/com/binance/dex/api/client/Wallet.java
+
+            byte[] pubKey = ecKeyBytes;
+            byte[] pubKeyPrefix = MessagePrefixes.PubKey;
+
+            byte[] pubKeyForSign = new byte[pubKey.Length + pubKeyPrefix.Length + 1];
+            pubKeyPrefix.CopyTo(pubKeyForSign, 0);
+            pubKeyForSign[pubKeyPrefix.Length] = 33;
+            pubKey.CopyTo(pubKeyForSign, pubKeyPrefix.Length + 1);
+
+            return pubKeyForSign;
+        }
+
+        #endregion
+        
     }
-    
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
-                .append("addressBytes", addressBytes)
-                .append("address", address)
-                .append("ecKey", ecKey)
-                .append("pubKeyForSign", pubKeyForSign)
-                .append("accountNumber", accountNumber)
-                .append("sequence", sequence)
-                .append("chainId", chainId)
-                .toString();
-    }
-     */
 }

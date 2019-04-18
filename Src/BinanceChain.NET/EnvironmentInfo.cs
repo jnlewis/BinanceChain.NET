@@ -35,7 +35,7 @@ namespace BinanceChain.NET
                 {
                     Name = "Binance Chain Live",
                     ApiBaseUrl = "https://dex.binance.org",
-                    WebSockerBaseUrl = "wss://dex.binance.org/api",
+                    WebSockerBaseUrl = "wss://dex.binance.org/api/ws",
                     Hrp = "bnb"
                 };
             }
@@ -49,24 +49,11 @@ namespace BinanceChain.NET
                 {
                     Name = "Binance Chain Testnet",
                     ApiBaseUrl = "https://testnet-dex.binance.org",
-                    WebSockerBaseUrl = "wss://testnet-dex.binance.org/api",
+                    WebSockerBaseUrl = "wss://testnet-dex.binance.org/api/ws",
                     Hrp = "tbnb"
                 };
             }
         }
-
-        public static EnvironmentInfo FAKE
-        {
-            get
-            {
-                return new EnvironmentInfo()
-                {
-                    Name = "Fake Env",
-                    ApiBaseUrl = "http://localhost/PMBWpiMobileSems",
-                    WebSockerBaseUrl = "wss://localhost/PMBWpiMobileSems/api",
-                    Hrp = "fbnb"
-                };
-            }
-        }
+        
     }
 }

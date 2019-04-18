@@ -27,13 +27,16 @@ namespace BinanceChain.NET.WebSocket.Streams
 
             // Connect to web socket
             this.webSocket = new WebSocketSharp.WebSocket(this.socketUrl);
+            this.webSocket.EmitOnPing = true;
+            this.webSocket.OnOpen += (object sender, EventArgs e) =>
+            {
+                this.webSocket.Send(message);
+                this.IsConnected = true;
+            };
             this.webSocket.OnMessage += WebSocket_OnMessage;
             this.webSocket.Connect();
-            this.webSocket.Send(message);
-
-            this.IsConnected = true;
         }
-
+        
         private void WebSocket_OnMessage(object sender, MessageEventArgs e)
         {
             OnMessageReceived?.Invoke(

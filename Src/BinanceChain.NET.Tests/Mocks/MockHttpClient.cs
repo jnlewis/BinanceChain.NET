@@ -30,5 +30,15 @@ namespace BinanceChain.NET.Tests.Mocks
         {
             return JsonConvert.DeserializeObject<T>(null);
         }
+
+        public async Task<T> PostAsync<T>(string requestUrl, object content, Encoding encoding, string mediaType)
+        {
+            return JsonConvert.DeserializeObject<T>(null);
+        }
+
+        public async Task<T> PostAsync<T>(Uri requestUrl, object content, Encoding encoding, string mediaType)
+        {
+            return JsonConvert.DeserializeObject<T>(null);
+        }
     }
 }

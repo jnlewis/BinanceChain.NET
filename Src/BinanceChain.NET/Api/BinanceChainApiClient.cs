@@ -9,7 +9,7 @@ using BinanceChain.NET.Api.Domain.TransactionMessages;
 
 namespace BinanceChain.NET.Api
 {
-    public class BinanceChainApiClient : BinanceChainApiBase, BinanceChainApi
+    public class BinanceChainApiClient : BinanceChainApiBase, IBinanceChainApiClient
     {
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
@@ -139,47 +139,46 @@ namespace BinanceChain.NET.Api
 
         #region Broadcast (Async)
 
-        public async Task<List<TransactionMetadata>> BroadcastAsync(bool sync, RequestBody transaction)
+        public async Task<List<TransactionMetadata>> BroadcastAsync(string transaction, bool sync = true)
         {
-            return await this.httpClient.PostAsync<List<TransactionMetadata>>($"{baseUrl}/api/v1/broadcast", transaction);
+            return await this.httpClient.PostAsync<List<TransactionMetadata>>($"{baseUrl}/api/v1/broadcast", transaction, System.Text.Encoding.UTF8, "text/plain");
         }
 
-        public Task<List<TransactionMetadata>> NewOrderAsync(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync)
+        public Task<List<TransactionMetadata>> NewOrderAsync(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync = true)
         {
-            //TODO: Check if wallet is ready - apply to all broadcast
             TransactionMessage message = new NewOrderMessage(newOrder, wallet, options);
-            return BroadcastAsync(sync, message.ToRequest());
+            return BroadcastAsync(message.BuildMessageBody());
         }
-        public Task<List<TransactionMetadata>> VoteAsync(Vote vote, Wallet wallet, TransactionOption options, bool sync)
+        public Task<List<TransactionMetadata>> VoteAsync(Vote vote, Wallet wallet, TransactionOption options, bool sync = true)
         {
             TransactionMessage message = new VoteMessage(vote, wallet, options);
-            return BroadcastAsync(sync, message.ToRequest());
+            return BroadcastAsync(message.BuildMessageBody());
         }
-        public Task<List<TransactionMetadata>> CancelOrderAsync(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync)
+        public Task<List<TransactionMetadata>> CancelOrderAsync(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync = true)
         {
             TransactionMessage message = new CancelOrderMessage(cancelOrder, wallet, options);
-            return BroadcastAsync(sync, message.ToRequest());
+            return BroadcastAsync(message.BuildMessageBody());
         }
-        public Task<List<TransactionMetadata>> TransferAsync(Transfer transfer, Wallet wallet, TransactionOption options, bool sync)
+        public Task<List<TransactionMetadata>> TransferAsync(Transfer transfer, Wallet wallet, TransactionOption options, bool sync = true)
         {
             TransactionMessage message = new TransferMessage(transfer, wallet, options);
-            return BroadcastAsync(sync, message.ToRequest());
+            return BroadcastAsync(message.BuildMessageBody());
         }
         //TODO:
-        //public Task<List<TransactionMetadata>> MultiTransferAsync(MultiTransfer multiTransfer, Wallet wallet, TransactionOption options, bool sync)
+        //public Task<List<TransactionMetadata>> MultiTransferAsync(MultiTransfer multiTransfer, Wallet wallet, TransactionOption options, bool sync = true)
         //{
         //    TransactionMessage message = new MultiTransferMessage(multiTransfer, wallet, options);
-        //    return BroadcastAsync(sync, message.ToRequest());
+        //    return BroadcastAsync(sync, message.BuildMessageBody());
         //}
-        public Task<List<TransactionMetadata>> FreezeAsync(TokenFreeze tokenFreeze, Wallet wallet, TransactionOption options, bool sync)
+        public Task<List<TransactionMetadata>> FreezeAsync(TokenFreeze tokenFreeze, Wallet wallet, TransactionOption options, bool sync = true)
         {
             TransactionMessage message = new TokenFreezeMessage(tokenFreeze, wallet, options);
-            return BroadcastAsync(sync, message.ToRequest());
+            return BroadcastAsync(message.BuildMessageBody());
         }
-        public Task<List<TransactionMetadata>> UnfreezeAsync(TokenUnfreeze tokenUnfreeze, Wallet wallet, TransactionOption options, bool sync)
+        public Task<List<TransactionMetadata>> UnfreezeAsync(TokenUnfreeze tokenUnfreeze, Wallet wallet, TransactionOption options, bool sync = true)
         {
             TransactionMessage message = new TokenUnfreezeMessage(tokenUnfreeze, wallet, options);
-            return BroadcastAsync(sync, message.ToRequest());
+            return BroadcastAsync(message.BuildMessageBody());
         }
 
         #endregion
@@ -213,13 +212,26 @@ namespace BinanceChain.NET.Api
 
         #region Broadcasts
 
-        public List<TransactionMetadata> Broadcast(bool sync, RequestBody transaction) => BroadcastAsync(sync, transaction).GetAwaiter().GetResult();
-        public List<TransactionMetadata> NewOrder(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync) => NewOrderAsync(newOrder, wallet, options, sync).GetAwaiter().GetResult();
-        public List<TransactionMetadata> Vote(Vote vote, Wallet wallet, TransactionOption options, bool sync) => VoteAsync(vote, wallet, options, sync).GetAwaiter().GetResult();
-        public List<TransactionMetadata> CancelOrder(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync) => CancelOrderAsync(cancelOrder, wallet, options, sync).GetAwaiter().GetResult();
-        public List<TransactionMetadata> Transfer(Transfer transfer, Wallet wallet, TransactionOption options, bool sync) => TransferAsync(transfer, wallet, options, sync).GetAwaiter().GetResult();
-        public List<TransactionMetadata> Freeze(TokenFreeze tokenFreeze, Wallet wallet, TransactionOption options, bool sync) => FreezeAsync(tokenFreeze, wallet, options, sync).GetAwaiter().GetResult();
-        public List<TransactionMetadata> Unfreeze(TokenUnfreeze tokenUnfreeze, Wallet wallet, TransactionOption options, bool sync) => UnfreezeAsync(tokenUnfreeze, wallet, options, sync).GetAwaiter().GetResult();
+        public List<TransactionMetadata> Broadcast(string transaction, bool sync = true) => 
+            BroadcastAsync(transaction, sync).GetAwaiter().GetResult();
+
+        public List<TransactionMetadata> NewOrder(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync = true) => 
+            NewOrderAsync(newOrder, wallet, options, sync).GetAwaiter().GetResult();
+
+        public List<TransactionMetadata> Vote(Vote vote, Wallet wallet, TransactionOption options, bool sync = true) => 
+            VoteAsync(vote, wallet, options, sync).GetAwaiter().GetResult();
+
+        public List<TransactionMetadata> CancelOrder(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync = true) => 
+            CancelOrderAsync(cancelOrder, wallet, options, sync).GetAwaiter().GetResult();
+
+        public List<TransactionMetadata> Transfer(Transfer transfer, Wallet wallet, TransactionOption options, bool sync = true) => 
+            TransferAsync(transfer, wallet, options, sync).GetAwaiter().GetResult();
+
+        public List<TransactionMetadata> Freeze(TokenFreeze tokenFreeze, Wallet wallet, TransactionOption options, bool sync = true) => 
+            FreezeAsync(tokenFreeze, wallet, options, sync).GetAwaiter().GetResult();
+
+        public List<TransactionMetadata> Unfreeze(TokenUnfreeze tokenUnfreeze, Wallet wallet, TransactionOption options, bool sync = true) => 
+            UnfreezeAsync(tokenUnfreeze, wallet, options, sync).GetAwaiter().GetResult();
 
         #endregion
     }
