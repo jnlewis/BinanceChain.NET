@@ -1,26 +1,26 @@
-# Binance Chain SDK for the .NET Platform.
-**BinanceChainNET is a complete library for interacting with the Binance Chain (DEX) on the .NET platform.**
+# Binance Chain SDK for the .NET/C# Platform.
+**BinanceChain .NET is a complete library for interacting with the Binance Chain (DEX) on the .NET platform.**
 
 ## Features
-* Wallet creation and management
 * Complete HTTP API and Web Socket coverage
 * Strongly typed bindings on all API and Web Socket entities.
 * Build-in transaction signing for broadcast.
+* Wallet creation and management
 * Node RPC support (coming soon)
 
 ## Compatability
-The library is built on .NET Standard 2.0 and is compatable with .NET Framework (Windows) and .NET Core (Windows, Mac, and Linux).
+The library is built on .NET Standard 2.0 for maximum compatability across .NET Framework (Windows) and .NET Core (Windows, Mac, and Linux).
 
 ## Installation
 BinanceChainNET is available on NuGet. To install, go to Visual Studio > Tools > NuGet Package Manager > Package Manager Console
 ```
 PM> Install-Package BinanceChain.NET
 ```
-## Usage Guide
-[View Complete Usage Documentation](https://github.com/jnlewis/binancechain-net)
+## SDK Documentation / User Guide
+[View Complete SDK Documentation](https://github.com/jnlewis/BinanceChain.NET/blob/master/Documentation.md)
 
 ## Roadmap/Future Enhancement
-Support for RPC is in the roadmap. See github issues for other enhancement proposals.
+See github issues for other enhancement proposals.
 
 ## Contribution
 All contributions to the BinanceChainNET are welcome. To contribute, please adhere to the following guidelines:
