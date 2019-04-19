@@ -2,9 +2,9 @@
 
 namespace BinanceChain.NET.Api.Domain
 {
-    public enum TimeInForce
+    public static class TimeInForce
     {
-        GoodTillExpire = 1,
-        ImmediateOrCancel = 3
+        public static int GoodTillExpire { get { return 1; } }
+        public static int ImmediateOrCancel { get { return 3; } }
     }
 }

@@ -2,8 +2,8 @@
 
 namespace BinanceChain.NET.Api.Domain
 {
-    public enum OrderTypes
+    public static class OrderTypes
     {
-        LimitOrder = 2
+        public static int LimitOrder { get { return 2; } }
     }
 }

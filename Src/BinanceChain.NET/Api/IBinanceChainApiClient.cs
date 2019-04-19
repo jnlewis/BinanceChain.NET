@@ -38,13 +38,13 @@ namespace BinanceChain.NET.Api
 
         #region Broadcast (Async)
 
-        Task<List<TransactionMetadata>> BroadcastAsync(string transaction, bool sync);
-        Task<List<TransactionMetadata>> NewOrderAsync(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync);
-        Task<List<TransactionMetadata>> VoteAsync(Vote vote, Wallet wallet, TransactionOption options, bool sync);
-        Task<List<TransactionMetadata>> CancelOrderAsync(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync);
-        Task<List<TransactionMetadata>> TransferAsync(Transfer transfer, Wallet wallet, TransactionOption options, bool sync);
-        Task<List<TransactionMetadata>> FreezeAsync(TokenFreeze tokenFreeze, Wallet wallet, TransactionOption options, bool sync);
-        Task<List<TransactionMetadata>> UnfreezeAsync(TokenUnfreeze tokenUnfreeze, Wallet wallet, TransactionOption options, bool sync);
+        Task<List<TransactionMetadata>> BroadcastAsync(string transaction, bool sync = false);
+        Task<List<TransactionMetadata>> NewOrderAsync(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync = false);
+        Task<List<TransactionMetadata>> VoteAsync(Vote vote, Wallet wallet, TransactionOption options, bool sync = false);
+        Task<List<TransactionMetadata>> CancelOrderAsync(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync = false);
+        Task<List<TransactionMetadata>> TransferAsync(Transfer transfer, Wallet wallet, TransactionOption options, bool sync = false);
+        Task<List<TransactionMetadata>> FreezeAsync(TokenFreeze tokenFreeze, Wallet wallet, TransactionOption options, bool sync = false);
+        Task<List<TransactionMetadata>> UnfreezeAsync(TokenUnfreeze tokenUnfreeze, Wallet wallet, TransactionOption options, bool sync = false);
 
         #endregion
 
@@ -77,13 +77,13 @@ namespace BinanceChain.NET.Api
 
         #region Broadcasts
 
-        List<TransactionMetadata> Broadcast(string transaction, bool sync);
-        List<TransactionMetadata> NewOrder(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync);
-        List<TransactionMetadata> Vote(Vote vote, Wallet wallet, TransactionOption options, bool sync);
-        List<TransactionMetadata> CancelOrder(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync);
-        List<TransactionMetadata> Transfer(Transfer transfer, Wallet wallet, TransactionOption options, bool sync);
-        List<TransactionMetadata> Freeze(TokenFreeze tokenFreeze, Wallet wallet, TransactionOption options, bool sync);
-        List<TransactionMetadata> Unfreeze(TokenUnfreeze tokenUnfreeze, Wallet wallet, TransactionOption options, bool sync);
+        List<TransactionMetadata> Broadcast(string transaction, bool sync = false);
+        List<TransactionMetadata> NewOrder(NewOrder newOrder, Wallet wallet, TransactionOption options, bool sync = false);
+        List<TransactionMetadata> Vote(Vote vote, Wallet wallet, TransactionOption options, bool sync = false);
+        List<TransactionMetadata> CancelOrder(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, bool sync = false);
+        List<TransactionMetadata> Transfer(Transfer transfer, Wallet wallet, TransactionOption options, bool sync = false);
+        List<TransactionMetadata> Freeze(TokenFreeze tokenFreeze, Wallet wallet, TransactionOption options, bool sync = false);
+        List<TransactionMetadata> Unfreeze(TokenUnfreeze tokenUnfreeze, Wallet wallet, TransactionOption options, bool sync = false);
 
         #endregion
 

@@ -2,9 +2,9 @@
 
 namespace BinanceChain.NET.Api.Domain
 {
-    public enum OrderSides
+    public static class OrderSides
     {
-        Buy = 1,
-        Sell = 2
+        public static int Buy { get { return 1; } }
+        public static int Sell { get { return 2; } }
     }
 }

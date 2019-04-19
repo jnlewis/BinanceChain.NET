@@ -12,5 +12,13 @@ namespace BinanceChain.NET.Tests
             
             Assert.IsTrue(wallet != null);
         }
+
+        [TestMethod]
+        public void OpenWallet_Test()
+        {
+            Wallet wallet = Wallet.Open("{privateKey}", EnvironmentInfo.TESTNET);
+
+            Assert.IsTrue(wallet != null);
+        }
     }
 }
