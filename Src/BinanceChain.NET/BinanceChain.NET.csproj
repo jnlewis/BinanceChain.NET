@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Jeffrey Lewis</Authors>
+    <Description>BinanceChain .NET is a complete library for interacting with the Binance Chain (DEX) on the .NET platform.</Description>
+    <RepositoryUrl>https://github.com/jnlewis/BinanceChain.NET</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/jnlewis/BinanceChain.NET</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/jnlewis/BinanceChain.NET/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageTags>binance</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
