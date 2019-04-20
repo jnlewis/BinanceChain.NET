@@ -2,10 +2,12 @@
 **BinanceChain .NET is a complete library for interacting with the Binance Chain (DEX) on the .NET platform.**
 
 ## Features
-* Complete HTTP API and Web Socket coverage
+* Complete coverage of HTTP API with synchronous and asynchronous support.
+* Complete coverage of Web Socket.
+* Transaction broadcast over HTTP API.
 * Strongly typed bindings on all API and Web Socket entities.
-* Build-in transaction signing for broadcast.
-* Wallet creation and management
+* Environment support on MainNet, TestNet, and custom environment.
+* New wallet creation and wallet opening by private key or mnemonic words.
 * Node RPC support (coming soon)
 
 ## Compatability
