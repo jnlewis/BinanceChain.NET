@@ -382,6 +382,12 @@ Wallet wallet = Wallet.NewWallet("testpassword", EnvironmentInfo.TESTNET);
 ```
 
 #### Opening a Wallet
+Opening a wallet by mnemonic words
+```c#
+Wallet wallet = Wallet.Open("{mnemonicWords}", "{password}", EnvironmentInfo.TESTNET);
+```
+
+Opening a wallet by private key
 ```c#
 Wallet wallet = Wallet.Open("{privateKey}", EnvironmentInfo.TESTNET);
 ```
