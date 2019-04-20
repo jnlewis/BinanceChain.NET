@@ -14,7 +14,15 @@ namespace BinanceChain.NET.Tests
         }
 
         [TestMethod]
-        public void OpenWallet_Test()
+        public void OpenWalletByMnemonic_Test()
+        {
+            Wallet wallet = Wallet.Open("{mnemonicWords}", "{password}", EnvironmentInfo.TESTNET);
+
+            Assert.IsTrue(wallet != null);
+        }
+
+        [TestMethod]
+        public void OpenWalletByPrivateKey_Test()
         {
             Wallet wallet = Wallet.Open("{privateKey}", EnvironmentInfo.TESTNET);
 
