@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace BinanceChain.NET.Utility.Network
 {
-    internal class DefaultHttpClient : IHttpClient
+    internal class JsonHttpClient : IHttpClient
     {
         private readonly HttpClient _httpClient;
 
-        public DefaultHttpClient()
+        public JsonHttpClient()
         {
             _httpClient = new HttpClient();
         }

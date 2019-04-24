@@ -8,7 +8,7 @@ namespace BinanceChain.NET
     {
         public static IBinanceChainApiClient CreateApiClient(EnvironmentInfo environment)
         {
-            IHttpClient httpClient = new DefaultHttpClient();
+            IHttpClient httpClient = new JsonHttpClient();
 
             return new BinanceChainApiClient(environment.ApiBaseUrl, httpClient);
         }

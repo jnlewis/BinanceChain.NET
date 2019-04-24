@@ -5,7 +5,7 @@ using BinanceChain.NET.Attributes;
 
 namespace BinanceChain.NET.Api
 {
-    public abstract class BinanceChainApiBase
+    public abstract class BinanceChainNodeBase
     {
         protected string Path(string value)
         {

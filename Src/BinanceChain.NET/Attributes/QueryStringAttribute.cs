@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BinanceChain.NET.Api.Attributes
+namespace BinanceChain.NET.Attributes
 {
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     internal class QueryStringAttribute : System.Attribute

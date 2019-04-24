@@ -11,8 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="NodeRPC\" />
-    <Folder Include="Utility\Protobuff\" />
+    <Compile Remove="Utility\Protobuff\**" />
+    <EmbeddedResource Remove="Utility\Protobuff\**" />
+    <None Remove="Utility\Protobuff\**" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿using BinanceChain.NET.Api.Attributes;
+﻿using BinanceChain.NET.Attributes;
 
 namespace BinanceChain.NET.Api.Domain.Requests
 {
