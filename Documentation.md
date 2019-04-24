@@ -32,7 +32,15 @@
     * [TickerStream](#ticketstream)
     * [AllSymbolsTickerStream](#allsymbolstickerstream)
     * [MiniTickerStream](#minitickerstream)
-    * [AllSymbolsMiniTickerStream](#all-symbols-mini-ticker-stream)
+    * [AllSymbolsMiniTickerStream](#allsymbolsminitickerstream)
+* [Node RPC Requests](#node-rpc-requests)
+    * [NodeStatus](#nodestatus-query)
+    * [ABCIInfo](#abciinfo-query)
+    * [ConsensusState](#consensusstate-query)
+    * [DumpConsensusState](#dumpconsensusstate-query)
+    * [NetInfo](#netinfo-query)
+    * [NumUnconfirmedTxs](#numunconfirmedtxs-query)
+    * [ABCIQuery](#abci-query)
 * [Wallet Management](#wallet)
     * [Creating a New Wallet](#creating-a-new-wallet)
     * [Opening a Wallet](#opening-a-wallet)
@@ -372,6 +380,63 @@ stream.OnDataReceived += (List<WebSocket.Domain.MiniTickerData> message) =>
 {
     Console.WriteLine(message);
 };
+```
+
+## Node RPC Requests
+
+To interact with the Binance Chain Node RPC, include the BinanceChain .NET NodeRPC namespaces in your class.
+```c#
+using BinanceChain.NET.NodeRPC;
+using BinanceChain.NET.NodeRPC.Domain.Requests;
+```
+Official Node RPC documentation: https://docs.binance.org/api-reference/node-rpc.html
+
+#### NodeStatus Query
+```c#
+var api = BinanceNodeFactory.CreateNodeClient(EnvironmentInfo.TESTNET_NODE);
+var result = api.GetNodeStatus();
+```
+
+#### ABCIInfo Query
+```c#
+var api = BinanceNodeFactory.CreateNodeClient(EnvironmentInfo.TESTNET_NODE);
+var result = api.GetABCIInfo();
+```
+
+#### ConsensusState Query
+```c#
+var api = BinanceNodeFactory.CreateNodeClient(EnvironmentInfo.TESTNET_NODE);
+var result = api.GetConsensusState();
+```
+
+#### DumpConsensusState Query
+```c#
+var api = BinanceNodeFactory.CreateNodeClient(EnvironmentInfo.TESTNET_NODE);
+var result = api.GetDumpConsensusState();
+```
+
+#### NetInfo Query
+```c#
+var api = BinanceNodeFactory.CreateNodeClient(EnvironmentInfo.TESTNET_NODE);
+var result = api.GetNetInfo();
+```
+
+#### NumUnconfirmedTxs Query
+```c#
+var api = BinanceNodeFactory.CreateNodeClient(EnvironmentInfo.TESTNET_NODE);
+var result = api.GetNumUnconfirmedTxs();
+```
+
+#### ABCIQuery Query
+```c#
+ABCIQueryRequest request = new ABCIQueryRequest()
+{
+    Path = "/store/acc/key",
+    Data = "6163636F756E743A89F856CB39D25C1BDDAAEC74A381577CA8E2F886"
+};
+
+var api = BinanceNodeFactory.CreateNodeClient(EnvironmentInfo.TESTNET_NODE);
+var result = api.GetABCIQuery(request);
 ```
 
 ## Wallet
