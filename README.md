@@ -8,7 +8,7 @@
 * Strongly typed bindings on all API and Web Socket entities.
 * Environment support on MainNet, TestNet, and custom environment.
 * New wallet creation and wallet opening by private key or mnemonic words.
-* Node RPC support (coming soon)
+* Node RPC support
 
 ## Compatability
 The library is built on .NET Standard 2.0 for maximum compatability across .NET Framework (Windows) and .NET Core (Windows, Mac, and Linux).
